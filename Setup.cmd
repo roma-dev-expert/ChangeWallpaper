@@ -1,11 +1,11 @@
 @echo off
-REM Проверка наличия Python
+REM Checking for the presence of Python
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Python не установлен на вашем компьютере.
-    echo Установите Python и повторите попытку.
+    echo Python is not installed on your computer.
+    echo Please install Python and try again.
     exit /b
 )
 
-REM Установка пакета wallpaperscraft с помощью pip
+REM Installing 'wallpaperscraft' package using pip3
 pip3 install wallpaperscraft
