@@ -18,16 +18,11 @@ public class Program
     {
         var api = new WallpapersCraftAPI();
 
-        var abstractPictures = await api.GetByCatalog(Catalog.ABSTRACT);
-        var pictures = await api.Search("bmw");
+        var pictures = await api.GetByCatalog(GetRandomItem(Catalog.Items));
+        //var pictures = await api.Search("bmw");
 
-        Random random = new Random();
-        int randomIndex = random.Next(0, pictures.Count);
-        Picture randomPicture = pictures[randomIndex];
-
-        var downloadLink = await randomPicture.GetDownloadLinkAsync();
+        var downloadLink = await GetRandomItem(pictures).GetDownloadLinkAsync();
         string relativePath = "Pictures\\image.jpg";
-
 
         CreateFolder();
 
@@ -45,6 +40,18 @@ public class Program
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
+    }
+
+    private static T GetRandomItem<T>(IList<T> item)
+    {
+        if (item == null || item.Count == 0)
+        {
+            throw new ArgumentException("The list is empty or null.");
+        }
+
+        Random random = new Random();
+        int randomIndex = random.Next(0, item.Count);
+        return item[randomIndex];
     }
 
     public static void UpdateDesktopWallpaper(string imagePath)
