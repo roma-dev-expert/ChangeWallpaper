@@ -1,10 +1,10 @@
-﻿using HtmlAgilityPack;
+﻿using AngleSharp;
+using AngleSharp.Dom;
 
 namespace ChangeWallpaper.WallpapersAPI
 {
     public class Picture
     {
-        private HttpClient httpClient;
 
         public string? Preview { get; set; }
         public string? Link { get; set; }
@@ -12,28 +12,22 @@ namespace ChangeWallpaper.WallpapersAPI
         public string? Rating { get; set; }
         public WallpapersCraftAPI? ApiClass { get; set; }
 
-        public Picture()
-        {
-
-            httpClient = new HttpClient();
-        }
-
         public async Task<string?> GetDownloadLinkAsync(string resolution = "1024x768")
         {
-            var link = $"{Link?.Replace("/wallpaper/", "/download/")}/{resolution}";
+            string link = $"{Link?.Replace("/wallpaper/", "/download/")}";
+
+            if (!link.EndsWith(resolution)) link += $"/{resolution}";
 
             var document = await Get(link);
-            var imgNode = document.DocumentNode.SelectSingleNode("//img[contains(@class, 'wallpaper__image')]");
-            return imgNode?.GetAttributeValue("src", null);
+            var imgNode = document.DocumentElement.QuerySelector("img.wallpaper__image");
+            return imgNode?.GetAttribute("src");
         }
 
-        private async Task<HtmlDocument> Get(string query)
+        public async Task<IDocument> Get(string query)
         {
-            var response = await httpClient.GetAsync(query);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            var document = new HtmlDocument();
-            document.LoadHtml(content);
+            var config = Configuration.Default.WithDefaultLoader();
+            var context = BrowsingContext.New(config);
+            var document = await context.OpenAsync(query);
             return document;
         }
 

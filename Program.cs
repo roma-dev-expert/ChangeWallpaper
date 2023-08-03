@@ -1,5 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using ChangeWallpaper.WallpapersAPI;
+using System.IO;
+using System.Net.Http;
 
 public class Program
 {
@@ -17,11 +19,13 @@ public class Program
     public static async Task Main(string[] args)
     {
         var api = new WallpapersCraftAPI();
+        var resolution = GetScreenResolution();
 
-        var pictures = await api.GetByCatalog(GetRandomItem(Catalog.Items));
+        var pictures = await api.GetByCatalog(GetRandomItem(Catalog.Items), resolution);
         //var pictures = await api.Search("bmw");
 
-        var downloadLink = await GetRandomItem(pictures).GetDownloadLinkAsync();
+        var randomPicture = GetRandomItem(pictures);
+        var downloadLink = await randomPicture.GetDownloadLinkAsync(resolution);
         string relativePath = "Pictures\\image.jpg";
 
         CreateFolder();
@@ -40,6 +44,14 @@ public class Program
         {
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
+    }
+
+    public static string GetScreenResolution()
+    {
+        var screens = Screen.AllScreens;
+        Screen primaryScreen = Screen.PrimaryScreen;
+        Screen screenWithHighestResolution = screens.Aggregate(primaryScreen, (maxScreen, nextScreen) => nextScreen.Bounds.Width * nextScreen.Bounds.Height > maxScreen.Bounds.Width * maxScreen.Bounds.Height ? nextScreen : maxScreen);
+        return $"{screenWithHighestResolution.Bounds.Width}x{screenWithHighestResolution.Bounds.Height}";
     }
 
     private static T GetRandomItem<T>(IList<T> item)

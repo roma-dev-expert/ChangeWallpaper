@@ -1,4 +1,4 @@
-﻿using HtmlAgilityPack;
+﻿using System.Net.Http;
 
 namespace ChangeWallpaper.WallpapersAPI
 {
@@ -12,7 +12,7 @@ namespace ChangeWallpaper.WallpapersAPI
             httpClient = new HttpClient();
         }
 
-        private async Task<HtmlDocument> Get(string query = "/")
+        private async Task<HtmlAgilityPack.HtmlDocument> Get(string query = "/")
         {
             if (!query.StartsWith(WEBSITE))
             {
@@ -22,12 +22,12 @@ namespace ChangeWallpaper.WallpapersAPI
             var response = await httpClient.GetAsync(query);
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            var document = new HtmlDocument();
+            var document = new HtmlAgilityPack.HtmlDocument();
             document.LoadHtml(content);
             return document;
         }
 
-        private List<Picture> GetAllPicturesFromPage(HtmlDocument page)
+        private List<Picture> GetAllPicturesFromPage(HtmlAgilityPack.HtmlDocument page)
         {
             var pictures = new List<Picture>();
             var picNodes = page.DocumentNode.SelectNodes("//li[contains(@class, 'wallpapers__item')]");
@@ -50,7 +50,7 @@ namespace ChangeWallpaper.WallpapersAPI
             return pictures;
         }
 
-        public async Task<List<Picture>> GetByCatalog(string catalog, int page = 1, string resolution = "")
+        public async Task<List<Picture>> GetByCatalog(string catalog, string resolution = "", int page = 1)
         {
             if (!string.IsNullOrEmpty(resolution))
             {
