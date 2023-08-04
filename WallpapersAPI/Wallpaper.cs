@@ -3,7 +3,7 @@ using AngleSharp.Dom;
 
 namespace ChangeWallpaper.WallpapersAPI
 {
-    public class Picture
+    public class Wallpaper
     {
 
         public string? Preview { get; set; }
@@ -17,18 +17,17 @@ namespace ChangeWallpaper.WallpapersAPI
 
             if (!link.EndsWith(resolution)) link += $"/{resolution}";
 
-            var document = await Get(link);
+            var document = await GetAsync(link);
             var imgNode = document.DocumentElement.QuerySelector("img.wallpaper__image");
             return imgNode?.GetAttribute("src");
         }
 
-        private async Task<IDocument> Get(string query)
+        private async Task<IDocument> GetAsync(string query)
         {
             var config = Configuration.Default.WithDefaultLoader();
             var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(query);
             return document;
         }
-
     }
 }

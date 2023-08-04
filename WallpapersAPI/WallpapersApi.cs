@@ -27,20 +27,20 @@ namespace ChangeWallpaper.WallpapersAPI
             return document;
         }
 
-        private List<Picture> GetAllPicturesFromPage(HtmlAgilityPack.HtmlDocument page)
+        private List<Wallpaper> GetAllWallpapersFromPage(HtmlAgilityPack.HtmlDocument page)
         {
             const string previewXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__canvas')]/img[contains(@class, 'wallpapers__image')]";
             const string linkXPath = ".//a[contains(@class, 'wallpapers__link')]";
             const string infoXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][2]";
             const string ratingXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][1]/span[contains(@class, 'wallpapers__info-rating')]";
 
-            var pictures = new List<Picture>();
+            var wallpapers = new List<Wallpaper>();
             var picNodes = page.DocumentNode.SelectNodes("//li[contains(@class, 'wallpapers__item')]");
             if (picNodes != null)
             {
                 foreach (var pic in picNodes)
                 {
-                    pictures.Add(new Picture
+                    wallpapers.Add(new Wallpaper
                     {
                         Preview = pic.SelectSingleNode(previewXPath)?.GetAttributeValue("src", null),
                         Link = WEBSITE + pic.SelectSingleNode(linkXPath)?.GetAttributeValue("href", null),
@@ -49,10 +49,10 @@ namespace ChangeWallpaper.WallpapersAPI
                     });
                 }
             }
-            return pictures;
+            return wallpapers;
         }
 
-        public async Task<List<Picture>> GetByCatalog(string catalog, string resolution, int page = 1)
+        public async Task<List<Wallpaper>> GetByCatalog(string catalog, string resolution, int page = 1)
         {
             if (!string.IsNullOrEmpty(resolution))
             {
@@ -64,10 +64,10 @@ namespace ChangeWallpaper.WallpapersAPI
             }
 
             var pageDocument = await Get($"/catalog/{catalog}{resolution}/page{page}");
-            return GetAllPicturesFromPage(pageDocument);
+            return GetAllWallpapersFromPage(pageDocument);
         }
 
-        public async Task<List<Picture>> Search(string query, string resolution, int page = 1)
+        public async Task<List<Wallpaper>> Search(string query, string resolution, int page = 1)
         {
             if (!string.IsNullOrEmpty(resolution) && !WallpaperSettings.Resolutions.Contains(resolution))
             {
@@ -76,7 +76,7 @@ namespace ChangeWallpaper.WallpapersAPI
 
             var pageDocument = await Get("https://wallpaperscraft.com/search/" +
                                          $"?order=&page={page}&query={query.Trim().Replace(" ", "+")}&size={resolution}");
-            return GetAllPicturesFromPage(pageDocument);
+            return GetAllWallpapersFromPage(pageDocument);
         }
     }
 }

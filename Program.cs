@@ -10,7 +10,7 @@ public class Program
     private const int SPIF_UPDATEINIFILE = 0x01;
     private const int SPIF_SENDCHANGE = 0x02;
 
-    private static readonly string picturePath = Path.Combine(Directory.GetCurrentDirectory(), "Pictures\\picture.jpg");
+    private static readonly string wallpaperPath = Path.Combine(Directory.GetCurrentDirectory(), "Wallpapers\\wallpaper.jpg");
     private static readonly HttpClient httpClient = new HttpClient();
     private static readonly Random random = new Random();
     private static readonly ILogger logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -24,7 +24,7 @@ public class Program
         {
             var resolution = GetResolution();
             var category = GetRandomItem(WallpaperSettings.Categories);
-            await DownloadRandomPicture(category, resolution);
+            await DownloadRandomWallpaper(category, resolution);
 
             UpdateDesktopWallpaper();
             logger.Information("Desktop wallpaper updated!");
@@ -55,8 +55,8 @@ public class Program
         try
         {
             var screenResolution = GetScreenResolution();
-            var availablePictureResolutions = WallpaperSettings.GetResolutionsGreaterThan(screenResolution);
-            return GetRandomItem(availablePictureResolutions);
+            var availableWallpaperResolutions = WallpaperSettings.GetResolutionsGreaterThan(screenResolution);
+            return GetRandomItem(availableWallpaperResolutions);
         }
         catch (Exception ex)
         {
@@ -78,17 +78,36 @@ public class Program
 
     private static void UpdateDesktopWallpaper()
     {
-        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, picturePath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, wallpaperPath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
     }
 
-    private static async Task DownloadPicture(string pictureUrl)
+    private static void CreateWallpapersDirectory()
     {
-        if (string.IsNullOrEmpty(pictureUrl))
+        var wallpapersDirectory = Path.GetDirectoryName(wallpaperPath);
+
+        try
         {
-            throw new ArgumentException("The picture URL is null or empty.");
+            if (!Directory.Exists(wallpapersDirectory))
+            {
+                Directory.CreateDirectory(wallpapersDirectory);
+                logger.Information("Wallpapers directory created successfully!");
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Error("An error occurred while creating the wallpapers directory: {ErrorMessage}", ex.Message);
+            return;
+        }
+    }
+
+    private static async Task DownloadWallpaper(string wallpaperUrl)
+    {
+        if (string.IsNullOrEmpty(wallpaperUrl))
+        {
+            throw new ArgumentException("The wallpaper URL is null or empty.");
         }
 
-        using var response = await httpClient.GetAsync(pictureUrl).ConfigureAwait(false);
+        using var response = await httpClient.GetAsync(wallpaperUrl).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
         if (!response.Content.Headers.ContentType.MediaType.StartsWith("image/"))
@@ -97,17 +116,19 @@ public class Program
         }
 
         await using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        await using var fileStream = File.Create(picturePath);
+        await using var fileStream = File.Create(wallpaperPath);
         await contentStream.CopyToAsync(fileStream).ConfigureAwait(false);
     }
 
-    private static async Task DownloadRandomPicture(string category, string resolution)
+    private static async Task DownloadRandomWallpaper(string category, string resolution)
     {
+        CreateWallpapersDirectory();
+
         var api = new WallpapersCraftAPI();
-        var pictures = await api.GetByCatalog(category, resolution);
-        var randomPicture = GetRandomItem(pictures);
-        var downloadLink = await randomPicture.GetDownloadLinkAsync(resolution);
-        await DownloadPicture(downloadLink);
-        logger.Information("Picture downloaded successfully!");
+        var wallpapers = await api.GetByCatalog(category, resolution);
+        var randomWallpaper = GetRandomItem(wallpapers);
+        var downloadLink = await randomWallpaper.GetDownloadLinkAsync(resolution);
+        await DownloadWallpaper(downloadLink);
+        logger.Information("Wallpaper downloaded successfully!");
     }
 }
