@@ -19,23 +19,23 @@ public class Program
     public static async Task Main(string[] args)
     {
         var api = new WallpapersCraftAPI();
-        var resolution = GetScreenResolution();
+        var resolution = GetResolution();
 
-        var pictures = await api.GetByCatalog(GetRandomItem(Catalog.Items), resolution);
+        var pictures = await api.GetByCatalog(GetRandomItem(WallpaperSettings.Categories), resolution);
         //var pictures = await api.Search("bmw");
 
         var randomPicture = GetRandomItem(pictures);
         var downloadLink = await randomPicture.GetDownloadLinkAsync(resolution);
-        string relativePath = "Pictures\\image.jpg";
+        string relativePath = "Pictures\\picture.jpg";
 
         CreateFolder();
 
         try
         {
-            string fullPath = await DownloadImage(downloadLink, relativePath);
-            Console.WriteLine("Image downloaded successfully!");
+            string fullPath = await DownloadPicture(downloadLink, relativePath);
+            Console.WriteLine("Picture downloaded successfully!");
 
-            // Update the desktop wallpaper with the downloaded image
+            // Update the desktop wallpaper with the downloaded picture
             UpdateDesktopWallpaper(fullPath);
 
             Console.WriteLine("Desktop wallpaper updated!");
@@ -54,6 +54,21 @@ public class Program
         return $"{screenWithHighestResolution.Bounds.Width}x{screenWithHighestResolution.Bounds.Height}";
     }
 
+    public static string GetResolution()
+    {
+        try
+        {
+            var screenResolution = GetScreenResolution();
+            var availablePictureResolutions = WallpaperSettings.GetResolutionsGreaterThan(screenResolution);
+            return GetRandomItem(availablePictureResolutions);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}. Used Default resolution: {WallpaperSettings.DefaultResolution}");
+            return WallpaperSettings.DefaultResolution;
+        }
+    }
+
     private static T GetRandomItem<T>(IList<T> item)
     {
         if (item == null || item.Count == 0)
@@ -66,18 +81,17 @@ public class Program
         return item[randomIndex];
     }
 
-    public static void UpdateDesktopWallpaper(string imagePath)
+    public static void UpdateDesktopWallpaper(string picturePath)
     {
-        // Call the SystemParametersInfo function to update the desktop wallpaper
-        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, imagePath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, picturePath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
     }
 
-    static async Task<string> DownloadImage(string? imageUrl, string relativePath)
+    static async Task<string> DownloadPicture(string? pictureUrl, string relativePath)
     {
         string fullPath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
         using (var httpClient = new HttpClient())
         {
-            using (var response = await httpClient.GetAsync(imageUrl))
+            using (var response = await httpClient.GetAsync(pictureUrl))
             {
                 response.EnsureSuccessStatusCode();
 

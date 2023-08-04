@@ -50,11 +50,11 @@ namespace ChangeWallpaper.WallpapersAPI
             return pictures;
         }
 
-        public async Task<List<Picture>> GetByCatalog(string catalog, string resolution = "", int page = 1)
+        public async Task<List<Picture>> GetByCatalog(string catalog, string resolution, int page = 1)
         {
             if (!string.IsNullOrEmpty(resolution))
             {
-                if (!RESOLUTIONS.Contains(resolution))
+                if (!WallpaperSettings.Resolutions.Contains(resolution))
                 {
                     throw new ArgumentException("Parameter <resolution> isn't a valid screen resolution! Please set a valid resolution.");
                 }
@@ -65,9 +65,9 @@ namespace ChangeWallpaper.WallpapersAPI
             return GetAllPicturesFromPage(pageDocument);
         }
 
-        public async Task<List<Picture>> Search(string query, int page = 1, string resolution = "")
+        public async Task<List<Picture>> Search(string query, string resolution, int page = 1)
         {
-            if (!string.IsNullOrEmpty(resolution) && !RESOLUTIONS.Contains(resolution))
+            if (!string.IsNullOrEmpty(resolution) && !WallpaperSettings.Resolutions.Contains(resolution))
             {
                 throw new ArgumentException("Parameter <resolution> isn't a valid screen resolution! Please set a valid resolution.");
             }
@@ -76,11 +76,5 @@ namespace ChangeWallpaper.WallpapersAPI
                                          $"?order=&page={page}&query={query.Trim().Replace(" ", "+")}&size={resolution}");
             return GetAllPicturesFromPage(pageDocument);
         }
-
-        private static readonly string[] RESOLUTIONS = { "1920x1080", "240x320", "240x400", "320x240", "320x480", "360x640", "480x800", "480x854", 
-            "540x960", "720x1280", "800x600", "800x1280", "960x544", "1024x600", "1080x1920", "2160x3840", "1366x768", "1440x2560", "800x1200", 
-            "800x1420", "938x1668", "1280x1280", "1350x2400", "3415x3415", "2780x2780", "1024x768", "1152x864", "1280x960", "1400x1050", "1600x1200", 
-            "1280x1024", "1280x720", "1280x800", "1440x900", "1680x1050", "1920x1200", "2560x1600", "1600x900", "2560x1440", "2048x1152", "2560x1024", 
-            "2560x1080", "3840x2400", "3840x2160", };
     }
 }

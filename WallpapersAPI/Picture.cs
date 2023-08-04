@@ -12,7 +12,7 @@ namespace ChangeWallpaper.WallpapersAPI
         public string? Rating { get; set; }
         public WallpapersCraftAPI? ApiClass { get; set; }
 
-        public async Task<string?> GetDownloadLinkAsync(string resolution = "1024x768")
+        public async Task<string?> GetDownloadLinkAsync(string resolution)
         {
             string link = $"{Link?.Replace("/wallpaper/", "/download/")}";
 
