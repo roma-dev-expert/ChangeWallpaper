@@ -23,10 +23,10 @@ namespace ChangeWallpaper.WallpapersAPI
             return imgNode?.GetAttribute("src");
         }
 
-        public async Task<IDocument> Get(string query)
+        private async Task<IDocument> Get(string query)
         {
             var config = Configuration.Default.WithDefaultLoader();
-            var context = BrowsingContext.New(config);
+            using var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(query);
             return document;
         }
