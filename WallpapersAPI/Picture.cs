@@ -10,7 +10,6 @@ namespace ChangeWallpaper.WallpapersAPI
         public string? Link { get; set; }
         public string? Info { get; set; }
         public string? Rating { get; set; }
-        public WallpapersCraftAPI? ApiClass { get; set; }
 
         public async Task<string?> GetDownloadLinkAsync(string resolution)
         {

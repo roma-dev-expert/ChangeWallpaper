@@ -45,8 +45,7 @@ namespace ChangeWallpaper.WallpapersAPI
                         Preview = pic.SelectSingleNode(previewXPath)?.GetAttributeValue("src", null),
                         Link = WEBSITE + pic.SelectSingleNode(linkXPath)?.GetAttributeValue("href", null),
                         Info = pic.SelectSingleNode(infoXPath)?.InnerText,
-                        Rating = pic.SelectSingleNode(ratingXPath)?.InnerText?.Trim(),
-                        ApiClass = this
+                        Rating = pic.SelectSingleNode(ratingXPath)?.InnerText?.Trim()
                     });
                 }
             }
