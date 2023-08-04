@@ -26,7 +26,7 @@ namespace ChangeWallpaper.WallpapersAPI
         private async Task<IDocument> Get(string query)
         {
             var config = Configuration.Default.WithDefaultLoader();
-            using var context = BrowsingContext.New(config);
+            var context = BrowsingContext.New(config);
             var document = await context.OpenAsync(query);
             return document;
         }
