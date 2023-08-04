@@ -29,6 +29,11 @@ namespace ChangeWallpaper.WallpapersAPI
 
         private List<Picture> GetAllPicturesFromPage(HtmlAgilityPack.HtmlDocument page)
         {
+            const string previewXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__canvas')]/img[contains(@class, 'wallpapers__image')]";
+            const string linkXPath = ".//a[contains(@class, 'wallpapers__link')]";
+            const string infoXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][2]";
+            const string ratingXPath = ".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][1]/span[contains(@class, 'wallpapers__info-rating')]";
+
             var pictures = new List<Picture>();
             var picNodes = page.DocumentNode.SelectNodes("//li[contains(@class, 'wallpapers__item')]");
             if (picNodes != null)
@@ -37,12 +42,10 @@ namespace ChangeWallpaper.WallpapersAPI
                 {
                     pictures.Add(new Picture
                     {
-                        Preview = pic.SelectSingleNode(".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__canvas')]/img[contains(@class, 'wallpapers__image')]")
-                            ?.GetAttributeValue("src", null),
-                        Link = WEBSITE + pic.SelectSingleNode(".//a[contains(@class, 'wallpapers__link')]")?.GetAttributeValue("href", null),
-                        Info = pic.SelectSingleNode(".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][2]")?.InnerText,
-                        Rating = pic.SelectSingleNode(".//a[contains(@class, 'wallpapers__link')]/span[contains(@class, 'wallpapers__info')][1]/span[contains(@class, 'wallpapers__info-rating')]")
-                            ?.InnerText?.Trim(),
+                        Preview = pic.SelectSingleNode(previewXPath)?.GetAttributeValue("src", null),
+                        Link = WEBSITE + pic.SelectSingleNode(linkXPath)?.GetAttributeValue("href", null),
+                        Info = pic.SelectSingleNode(infoXPath)?.InnerText,
+                        Rating = pic.SelectSingleNode(ratingXPath)?.InnerText?.Trim(),
                         ApiClass = this
                     });
                 }
