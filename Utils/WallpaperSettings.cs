@@ -1,5 +1,4 @@
-﻿
-namespace ChangeWallpaper.WallpapersAPI
+﻿namespace ChangeWallpaper.Utils
 {
     public static class WallpaperSettings
     {
