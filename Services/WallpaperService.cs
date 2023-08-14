@@ -24,7 +24,7 @@ namespace ChangeWallpaper.Services
             var randomWallpaper = wallpapers.GetRandomItem();
             var downloadLink = await api.GetDownloadLinkAsync(randomWallpaper.Link ?? "", resolution);
             await DownloadWallpaperAsync(downloadLink);
-            Logger.Information("Wallpaper downloaded successfully!");
+            Logger.Information($"Wallpaper for {category} category downloaded successfully!");
         }
 
         private async Task DownloadWallpaperAsync(string downloadLink)

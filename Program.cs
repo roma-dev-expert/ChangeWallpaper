@@ -1,12 +1,11 @@
 ﻿using System.IO;
 using System.Net.Http;
 using Serilog;
-using ChangeWallpaper.Utils;
-using ChangeWallpaper.Extensions;
 using ChangeWallpaper.Services;
 
 public class Program
 {
+    private static readonly CategoryFilter CategoryFilter = new CategoryFilter();
     private static readonly string WallpaperPath = Path.Combine(Directory.GetCurrentDirectory(), "Wallpapers\\wallpaper.jpg");
     private static readonly string LogsPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs\\log.txt");
     private static readonly ILogger Logger = new LoggerConfiguration().WriteTo.Console().WriteTo.File(LogsPath).CreateLogger();
@@ -18,8 +17,8 @@ public class Program
     {
         try
         {
+            var category = CategoryFilter.GetRandomCategory();
             var resolution = WallpaperService.GetWallpaperResolution();
-            var category = WallpaperSettings.Categories.GetRandomItem();
 
             DirectoryService.CreateWallpapersDirectory();
             await WallpaperService.DownloadRandomWallpaperAsync(category, resolution);
